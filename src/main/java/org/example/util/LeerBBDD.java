@@ -1,16 +1,16 @@
 package org.example.util;
 
-import org.example.DAOs.daoJuegoEquipo;
+import org.example.daos.*;
 import org.example.entidades.Juego;
-import org.example.DAOs.daoJuego;
-import org.example.entidades.juego_equipo;
+
+import org.example.entidades.Juego_equipo;
+
 import org.example.entidades.JuegosGenerados;
-import org.example.DAOs.daoJuegosGenerados;
+
 import java.sql.*;
 import java.util.List;
 import java.util.Scanner;
 
-import static org.example.DAOs.daoJuego.obtenerTituloPorId;
 
 /**
  * Clase encargada de gestionar la lectura de registros de la base de datos.
@@ -20,19 +20,9 @@ import static org.example.DAOs.daoJuego.obtenerTituloPorId;
  * el tipo de consulta y el ID o nombre para obtener la información deseada.</p>
  */
 public class LeerBBDD {
-    private static final Scanner sc = new Scanner(System.in);
-    private static final Connection connection;
-    private static final daoJuego juegoDAO;
+    private static  Scanner sc = new Scanner(System.in);
+    private static  DaoJuego juegoDAO;
 
-    static {
-        try {
-            // Inicializa la conexión a la base de datos
-            connection = ConnectionDB.getInstance().getConnection();
-            juegoDAO = new daoJuego(); // Inicializa el DAO después de la conexión
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al establecer la conexión a la base de datos", e);
-        }
-    }
 
     /**
      * Muestra el menú principal para leer registros de la base de datos y gestiona las opciones seleccionadas.
@@ -122,10 +112,10 @@ public class LeerBBDD {
         String nombreGenero = sc.nextLine();
 
         // Instancia del DAO
-        daoJuegosGenerados juegosGeneradosDAO = new daoJuegosGenerados(connection);
+        DaoJuegosGenerados juegosGeneradosDAO = new DaoJuegosGenerados();
 
         // Llamar al método para obtener los juegos asociados al género
-        List<JuegosGenerados> juegosPorGenero = juegosGeneradosDAO.obtenerJuegosPorGenero(nombreGenero);
+        List<JuegosGenerados> juegosPorGenero = juegosGeneradosDAO.obtenerPorNombreGenero(nombreGenero);
 
         // Mostrar los resultados
         if (juegosPorGenero.isEmpty()) {
@@ -134,7 +124,7 @@ public class LeerBBDD {
             System.out.println("Juegos asociados al género " + nombreGenero + ":");
             for (JuegosGenerados juego : juegosPorGenero) {
                 // Realizar una consulta directa para obtener el título del juego
-                String tituloJuego = obtenerTituloPorId(juego.getJuegoId());
+                String tituloJuego = juegoDAO.obtenerTituloPorId(juego.getJuegoId());
                 System.out.println("Título: " + tituloJuego + ", Géneros: " + juego.getGeneros());
             }
         }
@@ -170,17 +160,17 @@ public class LeerBBDD {
         String nombreEquipo = sc.nextLine();
 
         // Instancia del DAO
-        daoJuegoEquipo juegoEquipoDAO = new daoJuegoEquipo(connection);
+        DaoJuegoEquipo juegoEquipoDAO = new DaoJuegoEquipo();
 
         // Llamar al método para obtener los juegos relacionados con el nombre del equipo
-        List<juego_equipo> listaJuegosEquipo = juegoEquipoDAO.obtenerPorNombreDesarrollador(nombreEquipo);
+        List<Juego_equipo> listaJuegosEquipo = juegoEquipoDAO.obtenerPorNombreDesarrollador(nombreEquipo);
 
         // Mostrar los resultados
         if (listaJuegosEquipo.isEmpty()) {
             System.out.println("No se encontraron juegos para el equipo con nombre: " + nombreEquipo);
         } else {
             System.out.println("Juegos relacionados con el equipo " + nombreEquipo + ":");
-            for (juego_equipo je : listaJuegosEquipo) {
+            for (Juego_equipo je : listaJuegosEquipo) {
                 System.out.println(je.toString());
             }
         }

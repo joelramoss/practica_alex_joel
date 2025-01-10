@@ -134,7 +134,7 @@ public class Actualizarregistro {
         if (respuesta.equals("sí")) {
             System.out.println("Ingrese los nuevos géneros del juego (separados por coma): ");
             String nuevosGeneros = scanner.nextLine();
-            daoJuegosGenerados.crearRelacionJuegoGenero(juegoId, Integer.parseInt(nuevosGeneros));
+            DaoJuegosGenerados.crearRelacionJuegoGenero(juegoId, nuevosGeneros);
         }
     }
 
@@ -170,7 +170,7 @@ public class Actualizarregistro {
             System.out.print("Ingrese el ID del desarrollador a actualizar: ");
             int id = scanner.nextInt();
 
-            Desarrolladores desarrollador = dao.leerDesarrollador(id);
+            Desarrolladores desarrollador = dao.s(id);
             if (desarrollador == null) {
                 System.out.println("Desarrollador no encontrado.");
                 return;
@@ -179,7 +179,7 @@ public class Actualizarregistro {
             System.out.println("Datos actuales: " + desarrollador);
             desarrollador.setNombre(obtenerInputString(scanner, "Ingrese el nuevo nombre: "));
 
-            dao.actualizarDesarrollador(desarrollador);
+            dao.u(desarrollador);
         } catch (Exception e) {
             System.out.println("Error al actualizar el desarrollador: " + e.getMessage());
         }
@@ -197,7 +197,7 @@ public class Actualizarregistro {
             System.out.print("Ingrese el ID del género a actualizar: ");
             int id = scanner.nextInt();
 
-            Generos genero = dao.leerGenero(id);
+            Generos genero = dao.s(id);
             if (genero == null) {
                 System.out.println("Género no encontrado.");
                 return;
@@ -206,7 +206,7 @@ public class Actualizarregistro {
             System.out.println("Datos actuales: " + genero);
             genero.setGeneros(obtenerInputString(scanner, "Ingrese el nuevo nombre del género: "));
 
-            dao.actualizarGenero(genero);
+            dao.u(genero);
         } catch (Exception e) {
             System.out.println("Error al actualizar el género: " + e.getMessage());
         }

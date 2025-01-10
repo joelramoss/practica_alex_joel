@@ -1,35 +1,39 @@
 package org.example.util;
 
+import org.example.entidades.*;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 
-
-
-
-public class EiminarTodosregistros {
-
+public class EiminarTodosregistros  {
 
     public static void eliminarTodosLosDatos() {
-        try {
-            connection.setAutoCommit(false); // Inicia la transacción
+        Session session = HibernateUtil.getSessionFactory().openSession();  // Obtén la sesión de Hibernate
+        Transaction transaction = null;
 
-            // Eliminar todos los datos de las tablas
+        try {
+            transaction = session.beginTransaction();  // Inicia la transacción
+
+            // Eliminar todos los datos de las tablas mediante Hibernate
             String[] eliminarQueries = {
-                    "DELETE FROM rating",
-                    "DELETE FROM juego_equipo",
-                    "DELETE FROM juegos_generos",
-                    "DELETE FROM detalles_juego",
-                    "DELETE FROM desarrolladores",
-                    "DELETE FROM juego",
-                    "DELETE FROM generos"
+                    "DELETE FROM Rating",
+                    "DELETE FROM JuegoEquipo",
+                    "DELETE FROM JuegosGenerados",
+                    "DELETE FROM DetallesJuego",
+                    "DELETE FROM Desarrolladores",
+                    "DELETE FROM Juego",
+                    "DELETE FROM Generos"
             };
 
             // Ejecutar las consultas DELETE
             for (String query : eliminarQueries) {
-                try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                    stmt.executeUpdate();
-                }
+                Query<?> hqlQuery = session.createQuery(query);
+                hqlQuery.executeUpdate();
             }
 
             // Reiniciar los contadores de auto incremento
+            // Hibernate generalmente maneja el auto-incremento de forma automática,
+            // pero si deseas forzar el reinicio, puedes hacerlo mediante una consulta nativa.
             String[] autoIncrementaronQueries = {
                     "ALTER TABLE desarrolladores AUTO_INCREMENT = 1",
                     "ALTER TABLE juego AUTO_INCREMENT = 1",
@@ -40,26 +44,19 @@ public class EiminarTodosregistros {
 
             // Ejecutar las consultas ALTER para reiniciar el auto incremento
             for (String query : autoIncrementaronQueries) {
-                try (PreparedStatement stmt = connection.prepareStatement(query)) {
-                    stmt.executeUpdate();
-                }
+                Query<?> hqlQuery = session.createNativeQuery(query);
+                hqlQuery.executeUpdate();
             }
 
-            connection.commit(); // Confirmar la transacción
+            transaction.commit();  // Confirmar la transacción
             System.out.println("Todos los datos han sido eliminados y los contadores de autoincremento reiniciados con éxito.");
-        } catch (SQLException e) {
-            try {
-                connection.rollback(); // Revierte la transacción en caso de error
-            } catch (SQLException ex) {
-                System.err.println("Error al revertir la transacción: " + ex.getMessage());
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();  // Revierte la transacción en caso de error
             }
             System.err.println("Error al eliminar los datos: " + e.getMessage());
         } finally {
-            try {
-                connection.setAutoCommit(true); // Restablece el modo por defecto
-            } catch (SQLException e) {
-                System.err.println("Error al restablecer el modo de autocommit: " + e.getMessage());
-            }
+            session.close();  // Cerrar la sesión
         }
     }
 }

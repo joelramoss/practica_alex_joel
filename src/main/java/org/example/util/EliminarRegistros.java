@@ -67,8 +67,6 @@ public class EliminarRegistros {
         } catch (InputMismatchException e) {
             sc.nextLine(); // Limpiar el buffer del Scanner
             System.out.println("Entrada inválida. Por favor, ingrese un número válido.");
-        } catch (SQLException e) {
-            System.out.println("Error al eliminar el juego: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Ocurrió un error inesperado: " + e.getMessage());
         }
