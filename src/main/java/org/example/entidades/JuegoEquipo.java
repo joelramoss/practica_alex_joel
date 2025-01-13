@@ -4,9 +4,10 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "juego_equipo")
-public class Juego_equipo {
+public class JuegoEquipo {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
@@ -16,9 +17,9 @@ public class Juego_equipo {
     @Column(name = "desarrollador_id")
     private int desarrolladorId;
 
-    public Juego_equipo() {}
+    public JuegoEquipo() {}
 
-    public Juego_equipo(int id, int juegoId, int desarrolladorId) {
+    public JuegoEquipo(int id, int juegoId, int desarrolladorId) {
         this.id = id;
         this.juegoId = juegoId;
         this.desarrolladorId = desarrolladorId;

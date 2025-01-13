@@ -4,35 +4,36 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "juegos")
+@Table(name = "juego")
 public class Juego {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
-    @Column(name = "title")
+    @Column(name = "Title")
     private String title;
 
-    @Column(name = "release_date")
+    @Column(name = "Release_Date")
     private Date releaseDate;
 
-    @Column(name = "summary")
+    @Column(name = "Summary")
     private String summary;
 
-    @Column(name = "plays")
+    @Column(name = "Plays")
     private int plays;
 
-    @Column(name = "playing")
+    @Column(name = "Playing")
     private int playing;
 
-    @Column(name = "backlogs")
+    @Column(name = "Backlogs")
     private int backlogs;
 
-    @Column(name = "wishlist")
+    @Column(name = "Wishlist")
     private int wishlist;
 
-    @Column(name = "times_listed")
+    @Column(name = "timesListed")
     private int timesListed;
 
     public Juego() {}

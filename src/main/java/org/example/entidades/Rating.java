@@ -3,17 +3,17 @@ package org.example.entidades;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ratings")
+@Table(name = "rating")
 public class Rating {
 
     @Id
-    @Column(name = "juego_id")
+    @Column(name = "Juego_ID")
     private int juegoId;
 
-    @Column(name = "rating")
+    @Column(name = "Rating")
     private double rating;
 
-    @Column(name = "number_of_reviews")
+    @Column(name = "Number_of_Reviews")
     private int numberOfReviews;
 
     public Rating() {}

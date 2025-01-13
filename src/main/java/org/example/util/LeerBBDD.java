@@ -3,7 +3,8 @@ package org.example.util;
 import org.example.daos.*;
 import org.example.entidades.Juego;
 
-import org.example.entidades.Juego_equipo;
+
+import org.example.entidades.JuegoEquipo;
 
 import org.example.entidades.JuegosGenerados;
 
@@ -163,14 +164,14 @@ public class LeerBBDD {
         DaoJuegoEquipo juegoEquipoDAO = new DaoJuegoEquipo();
 
         // Llamar al método para obtener los juegos relacionados con el nombre del equipo
-        List<Juego_equipo> listaJuegosEquipo = juegoEquipoDAO.obtenerPorNombreDesarrollador(nombreEquipo);
+        List<JuegoEquipo> listaJuegosEquipo = juegoEquipoDAO.obtenerPorNombreDesarrollador(nombreEquipo);
 
         // Mostrar los resultados
         if (listaJuegosEquipo.isEmpty()) {
             System.out.println("No se encontraron juegos para el equipo con nombre: " + nombreEquipo);
         } else {
             System.out.println("Juegos relacionados con el equipo " + nombreEquipo + ":");
-            for (Juego_equipo je : listaJuegosEquipo) {
+            for (JuegoEquipo je : listaJuegosEquipo) {
                 System.out.println(je.toString());
             }
         }

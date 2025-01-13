@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<!DOCTYPE hibernate-configuration PUBLIC
-        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
         <!-- Conexión a la base de datos -->
@@ -18,12 +16,12 @@
         <property name="hibernate.hbm2ddl.auto">update</property>
 
         <!-- Mapeo de clases -->
-        <mapping class="entidades.Desarrolladores"/>
-        <mapping class="entidades.DetallesJuego"/>
-        <mapping class="entidades.Generos"/>
-        <mapping class="entidades.Juego"/>
-        <mapping class="entidades.Juego_equipo"/>
-        <mapping class="entidades.JuegosGenerados"/>
-        <mapping class="entidades.Rating"/>
+        <mapping class="org.example.entidades.DetallesJuego"/>
+        <mapping class="org.example.entidades.Desarrolladores"/>
+        <mapping class="org.example.entidades.Generos"/>
+        <mapping class="org.example.entidades.Juego"/>
+        <mapping class="org.example.entidades.JuegoEquipo"/>
+        <mapping class="org.example.entidades.JuegosGenerados"/>
+        <mapping class="org.example.entidades.Rating"/>
     </session-factory>
 </hibernate-configuration>

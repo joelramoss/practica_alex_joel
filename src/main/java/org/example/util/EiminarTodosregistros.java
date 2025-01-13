@@ -25,6 +25,7 @@ public class EiminarTodosregistros  {
                     "DELETE FROM Generos"
             };
 
+
             // Ejecutar las consultas DELETE
             for (String query : eliminarQueries) {
                 Query<?> hqlQuery = session.createQuery(query);

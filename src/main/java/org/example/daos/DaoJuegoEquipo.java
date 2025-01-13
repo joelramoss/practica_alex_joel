@@ -1,6 +1,7 @@
 package org.example.daos;
 
-import org.example.entidades.Juego_equipo;
+import org.example.entidades.JuegoEquipo;
+
 import org.example.util.HibernateUtil;
 import org.hibernate.*;
 import org.hibernate.query.Query;
@@ -14,7 +15,7 @@ public class DaoJuegoEquipo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            Juego_equipo relacion = new Juego_equipo(); // Creamos el objeto sin asignar id (será autogenerado)
+            JuegoEquipo relacion = new JuegoEquipo(); // Creamos el objeto sin asignar id (será autogenerado)
             relacion.setJuegoId(juegoId);
             relacion.setDesarrolladorId(desarrolladorId);
             session.save(relacion); // Guardamos la nueva relación
@@ -27,9 +28,9 @@ public class DaoJuegoEquipo {
     }
 
     // Leer una relación entre un juego y un desarrollador por su ID
-    public Juego_equipo leerJuegoEquipo(int id) {
+    public JuegoEquipo leerJuegoEquipo(int id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Juego_equipo.class, id); // Obtener relación por ID
+            return session.get(JuegoEquipo.class, id); // Obtener relación por ID
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -37,9 +38,9 @@ public class DaoJuegoEquipo {
     }
 
     // Obtener todas las relaciones entre juegos y desarrolladores
-    public List<Juego_equipo> obtenerTodos() {
+    public List<JuegoEquipo> obtenerTodos() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<Juego_equipo> query = session.createQuery("FROM Juego_equipo", Juego_equipo.class);
+            Query<JuegoEquipo> query = session.createQuery("FROM Juego_equipo", JuegoEquipo.class);
             return query.list(); // Retornar todas las relaciones
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,12 +49,12 @@ public class DaoJuegoEquipo {
     }
 
     // Obtener todas las relaciones entre juegos y desarrolladores por el nombre del desarrollador
-    public List<Juego_equipo> obtenerPorNombreDesarrollador(String nombreDesarrollador) {
+    public List<JuegoEquipo> obtenerPorNombreDesarrollador(String nombreDesarrollador) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT je FROM Juego_equipo je " +
                     "JOIN Desarrollador d ON je.desarrolladorId = d.id " +
                     "WHERE d.nombre = :nombreDesarrollador";
-            Query<Juego_equipo> query = session.createQuery(hql, Juego_equipo.class);
+            Query<JuegoEquipo> query = session.createQuery(hql, JuegoEquipo.class);
             query.setParameter("nombreDesarrollador", nombreDesarrollador);
             return query.list(); // Retornar relaciones filtradas por el nombre del desarrollador
         } catch (Exception e) {
@@ -63,7 +64,7 @@ public class DaoJuegoEquipo {
     }
 
     // Actualizar una relación entre un juego y un desarrollador
-    public void actualizarRelacionJuegoDesarrollador(Juego_equipo relacion) {
+    public void actualizarRelacionJuegoDesarrollador(JuegoEquipo relacion) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
@@ -83,7 +84,7 @@ public class DaoJuegoEquipo {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
 
-            Juego_equipo relacion = session.get(Juego_equipo.class, id); // Obtener relación por ID
+            JuegoEquipo relacion = session.get(JuegoEquipo.class, id); // Obtener relación por ID
             if (relacion != null) {
                 session.delete(relacion); // Eliminar relación
             }

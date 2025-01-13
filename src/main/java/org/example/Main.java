@@ -2,6 +2,7 @@ package org.example;
 
 import org.example.util.*;
 import org.hibernate.Session;
+
 import java.io.IOException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -73,6 +74,7 @@ public class Main {
     public static void conectarBaseDatos() {
         if (session == null || !session.isOpen()) {
             session = HibernateUtil.getSessionFactory().openSession();
+
             System.out.println("Conexión establecida con éxito.");
         } else {
             System.out.println("Ya estás conectado a la base de datos.");

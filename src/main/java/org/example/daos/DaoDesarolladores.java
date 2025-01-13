@@ -1,12 +1,8 @@
 package org.example.daos;
 
-import org.example.entidades.Juego;
+import org.example.entidades.Desarrolladores;
 import org.example.util.HibernateUtil;
 import org.hibernate.*;
-import org.example.entidades.*;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class DaoDesarolladores {
     //insert
