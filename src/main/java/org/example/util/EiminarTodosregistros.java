@@ -1,6 +1,6 @@
 package org.example.util;
 
-import org.example.entidades.*;
+
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
@@ -40,7 +40,6 @@ public class EiminarTodosregistros  {
                     "ALTER TABLE juego AUTO_INCREMENT = 1",
                     "ALTER TABLE generos AUTO_INCREMENT = 1",
                     "ALTER TABLE juego_equipo AUTO_INCREMENT = 1",
-                    "ALTER TABLE juegos_generos AUTO_INCREMENT = 1"
             };
 
             // Ejecutar las consultas ALTER para reiniciar el auto incremento
@@ -55,9 +54,10 @@ public class EiminarTodosregistros  {
             if (transaction != null) {
                 transaction.rollback();  // Revierte la transacción en caso de error
             }
+
             System.err.println("Error al eliminar los datos: " + e.getMessage());
         } finally {
-            session.close();  // Cerrar la sesión
+            if (session != null && session.isOpen()) session.close();  // Cerrar la sesión
         }
     }
 }

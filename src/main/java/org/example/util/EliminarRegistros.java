@@ -2,15 +2,15 @@ package org.example.util;
 
 import org.example.daos.DaoJuego;
 import org.example.entidades.Juego;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.sql.SQLException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-
 public class EliminarRegistros {
-    private static final Scanner sc = new Scanner(System.in); // Instancia única de Scanner
-
+    private static final Scanner sc = new Scanner(System.in);
 
     public static void menu() throws SQLException {
         boolean salir = false;
@@ -37,46 +37,54 @@ public class EliminarRegistros {
             }
         }
     }
+
     private static void eliminarJuego() {
-        try {
-            System.out.print("Ingrese el ID del juego a eliminar: ");
-            int id = sc.nextInt();
-            sc.nextLine(); // Limpiar el buffer después de leer un entero
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Transaction transaction = session.beginTransaction();
 
-            // Confirmar la eliminación
-            System.out.print("¿Está seguro de que desea eliminar este juego y todas sus relaciones? (S/N): ");
-            String confirmacion = sc.nextLine().trim().toLowerCase();
+            try {
+                DaoJuego dao = new DaoJuego(session);
 
-            if (confirmacion.equals("N")) {
-                System.out.println("Operación cancelada.");
-                return;
+                System.out.print("Ingrese el ID del juego a eliminar: ");
+                int id = sc.nextInt();
+                sc.nextLine(); // Limpiar el buffer después de leer un entero
+
+                // Confirmar la eliminación
+                System.out.print("¿Está seguro de que desea eliminar este juego y todas sus relaciones? (S/N): ");
+                String confirmacion = sc.nextLine().trim().toLowerCase();
+
+                if (!confirmacion.equals("s")) {
+                    System.out.println("Operación cancelada.");
+                    return;
+                }
+
+                // Verificar si el juego existe antes de eliminarlo
+                Juego juego = dao.obtenerPorId(id);
+                if (juego == null) {
+                    System.out.println("El juego con ID " + id + " no existe en la base de datos.");
+                    return;
+                }
+
+                // Llamar a eliminarJuegoYRelaciones del DAO
+                dao.eliminarJuegoYRelaciones(id);
+
+                transaction.commit();
+                System.out.println("El juego con ID " + id + " ha sido eliminado exitosamente, junto con todas sus relaciones.");
+            } catch (Exception e) {
+                transaction.rollback();
+                System.out.println("Ocurrió un error inesperado durante la eliminación: " + e.getMessage());
+                e.printStackTrace();
             }
-
-            // Verificar si el juego existe antes de eliminarlo
-            DaoJuego dao = new DaoJuego();
-            Juego juego = dao.obtenerPorId(id);
-            if (juego == null) {
-                System.out.println("El juego con ID " + id + " no existe en la base de datos.");
-                return;
-            }
-
-            // Llamar a eliminarJuegoYRelaciones del DAO
-            DaoJuego.eliminarJuegoYRelaciones(id);
-
-            System.out.println("El juego con ID " + id + " ha sido eliminado exitosamente, junto con todas sus relaciones.");
-        } catch (InputMismatchException e) {
-            sc.nextLine(); // Limpiar el buffer del Scanner
-            System.out.println("Entrada inválida. Por favor, ingrese un número válido.");
         } catch (Exception e) {
-            System.out.println("Ocurrió un error inesperado: " + e.getMessage());
+            System.out.println("Error al abrir la sesión de Hibernate: " + e.getMessage());
+            e.printStackTrace();
         }
     }
-
 
     private static int leerOpcion() {
         try {
             return sc.nextInt();
-        } catch (Exception e) {
+        } catch (InputMismatchException e) {
             sc.nextLine(); // Limpiar buffer
             System.out.println("Entrada inválida. Por favor, ingrese un número.");
             return -1; // Valor inválido para manejar errores

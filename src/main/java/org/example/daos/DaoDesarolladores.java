@@ -1,72 +1,79 @@
 package org.example.daos;
 
 import org.example.entidades.Desarrolladores;
-import org.example.util.HibernateUtil;
-import org.hibernate.*;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
+import java.util.List;
 
 public class DaoDesarolladores {
-    //insert
+
+    private Session session;
+
+    // Constructor que acepta una sesión activa
+    public DaoDesarolladores(Session session) {
+        this.session = session;
+    }
+
+    // Insertar un desarrollador
     public void i(Desarrolladores desarrollador) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            // Guardar el objeto Desarrolladores
-            session.save(desarrollador);
-            transaction.commit();
-
+        try {
+            session.persist(desarrollador); // Usar la sesión activa para guardar el objeto
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al insertar desarrollador: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
-    //update
+
+    // Actualizar un desarrollador
     public void u(Desarrolladores desarrollador) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            // Actualizar el objeto Desarrolladores
-            session.update(desarrollador);
-            transaction.commit();
-
+        try {
+            session.update(desarrollador); // Usar la sesión activa para actualizar el objeto
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al actualizar desarrollador: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
-    //delete
-    public void d(int id) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
 
-            // Obtener el Desarrollador por ID
+    // Eliminar un desarrollador por ID
+    public void d(int id) {
+        try {
             Desarrolladores desarrollador = session.get(Desarrolladores.class, id);
             if (desarrollador != null) {
-                // Eliminar el objeto Desarrolladores
-                session.delete(desarrollador);
-                transaction.commit();
+                session.delete(desarrollador); // Usar la sesión activa para eliminar el objeto
             }
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al eliminar desarrollador: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
+    public List<Desarrolladores> obtenerTodos() {
+        Query<Desarrolladores> query = session.createQuery("FROM Desarrolladores", Desarrolladores.class);
+        return query.list();
+    }
 
-    //select
+    // Seleccionar un desarrollador por ID
     public Desarrolladores s(int id) {
-        Desarrolladores desarrollador = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Obtener el Desarrollador por ID
-            desarrollador = session.get(Desarrolladores.class, id);
+        try {
+            return session.get(Desarrolladores.class, id); // Usar la sesión activa para obtener el objeto
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al seleccionar desarrollador: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
-
+    }
+    public Desarrolladores obtenerPorNombre(String nombreDesarrollador) {
+        Query<Desarrolladores> query = session.createQuery("FROM Desarrolladores WHERE nombre = :nombre", Desarrolladores.class);
+        query.setParameter("nombre", nombreDesarrollador);
+        return query.uniqueResult();
+    }
+    public Desarrolladores crearOObtenerDesarrollador(String nombreDesarrollador) {
+        Desarrolladores desarrollador = obtenerPorNombre(nombreDesarrollador);
+        if (desarrollador == null) {
+            desarrollador = new Desarrolladores();
+            desarrollador.setNombre(nombreDesarrollador);
+            session.persist(desarrollador);
+        }
         return desarrollador;
     }
-
-
-
 }

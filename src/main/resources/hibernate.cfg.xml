@@ -4,12 +4,14 @@
     <session-factory>
         <!-- Conexión a la base de datos -->
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
-        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/games?useSSL=false</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/test?useSSL=false</property>
         <property name="hibernate.connection.username">root</property>
         <property name="hibernate.connection.password"></property>
 
         <!-- Dialecto de MySQL -->
         <property name="hibernate.dialect">org.hibernate.dialect.MariaDBDialect</property>
+        <property name="hibernate.current_session_context_class">thread</property>
+
 
         <!-- Opciones -->
         <property name="hibernate.show_sql">true</property>

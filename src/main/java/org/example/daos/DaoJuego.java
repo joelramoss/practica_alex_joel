@@ -1,90 +1,79 @@
 package org.example.daos;
 
 import org.example.entidades.Juego;
-import org.example.util.HibernateUtil;
-import org.hibernate.*;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import java.util.List;
 
 public class DaoJuego {
 
+    private static Session session;
+
+    // Constructor que acepta una sesión activa
+    public DaoJuego(Session session) {
+        this.session = session;
+    }
+
     // Crear un nuevo juego en la base de datos
     public void crearJuego(Juego juego) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            session.save(juego); // Guardamos el juego, el ID se genera automáticamente
-            transaction.commit();
-
+        try {
+            session.merge(juego); // Usa merge para manejar entidades existentes o detached
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al crear juego: " + e.getMessage());
+            throw e; // Propaga la excepción
         }
     }
 
+
     // Obtener todos los juegos de la base de datos
     public List<Juego> obtenerTodos() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try {
             Query<Juego> query = session.createQuery("FROM Juego", Juego.class);
             return query.list(); // Retorna la lista de juegos
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al obtener todos los juegos: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
-        return null;
     }
 
     // Obtener un juego por su ID
     public Juego obtenerPorId(int id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Juego.class, id); // Recuperamos el juego por su ID
+        try {
+            return session.get(Juego.class, id); // Recuperar el juego por su ID
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al obtener juego por ID: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
-        return null;
     }
 
     // Actualizar los datos de un juego en la base de datos
     public void actualizarJuego(Juego juego) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            session.update(juego); // Actualizamos el juego en la base de datos
-            transaction.commit();
-
+        try {
+            session.update(juego); // Actualizar el juego usando la sesión activa
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al actualizar juego: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
 
     // Eliminar un juego de la base de datos por su ID
     public void eliminarJuego(int id) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            Juego juego = session.get(Juego.class, id); // Obtenemos el juego por ID
+        try {
+            Juego juego = session.get(Juego.class, id);
             if (juego != null) {
-                session.delete(juego); // Eliminamos el juego
+                session.delete(juego); // Eliminar el juego usando la sesión activa
             }
-            transaction.commit();
-
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al eliminar juego: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
 
     // Eliminar un juego y sus relaciones en las tablas relacionadas
     public static void eliminarJuegoYRelaciones(int id) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            // Eliminar relaciones asociadas al juego, usando HQL o Criteria
+        try {
+            // Eliminar relaciones asociadas al juego usando HQL
             String hqlRating = "DELETE FROM Rating WHERE juegoId = :id";
             session.createQuery(hqlRating).setParameter("id", id).executeUpdate();
 
@@ -100,28 +89,39 @@ public class DaoJuego {
             // Ahora eliminar el juego principal
             Juego juego = session.get(Juego.class, id);
             if (juego != null) {
-                session.delete(juego); // Eliminar el juego
+                session.delete(juego); // Eliminar el juego principal
             }
-
-            transaction.commit();
-
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al eliminar juego y sus relaciones: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
 
+
+    public int obtenerUltimoId() {
+        try {
+            String hql = "SELECT MAX(j.id) FROM Juego j"; // Usamos MAX para obtener el ID más alto
+            Query<Integer> query = session.createQuery(hql, Integer.class);
+            Integer ultimoId = query.uniqueResult(); // Obtener el único resultado
+            return (ultimoId != null) ? ultimoId : 0; // Si no hay registros, devolver 0
+        } catch (Exception e) {
+            System.err.println("Error al obtener el último ID: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
+        }
+    }
+
+
     // Obtener el título de un juego por su ID
     public String obtenerTituloPorId(int juegoId) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        try {
             Juego juego = session.get(Juego.class, juegoId);
             if (juego != null) {
                 return juego.getTitle();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al obtener título del juego: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
         return "Título no encontrado"; // Retornar un mensaje si no se encuentra
     }
 }
-

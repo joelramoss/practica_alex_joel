@@ -1,92 +1,88 @@
 package org.example.daos;
 
-import org.example.entidades.*;
-import org.example.util.HibernateUtil;
-import org.hibernate.*;
+import org.example.entidades.Generos;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
-
 
 public class DaoGeneros {
 
-    //crud tabla generos
-    //insert(hibernate javax)
+    private final Session session;
+
+    // Constructor que acepta una sesión activa
+    public DaoGeneros(Session session) {
+        this.session = session;
+    }
+
+    // Insertar un género
     public int i(Generos genero) {
-        Transaction transaction = null;
-        int idGenerado = -1;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            // Guardar el objeto Genero
-            session.save(genero);
-            idGenerado = genero.getId(); // Obtener el ID generado
-            transaction.commit();
-
+        try {
+            session.persist(genero); // Usar la sesión activa para guardar el objeto
+            return genero.getId(); // Obtener el ID generado
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al insertar género: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
-        return idGenerado;
     }
-    //update(hibernate javax)
+
+    // Actualizar un género
     public void u(Generos genero) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            // Actualizar el objeto Género
-            session.update(genero);
-            transaction.commit();
-
+        try {
+            session.update(genero); // Usar la sesión activa para actualizar el objeto
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al actualizar género: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
-    //delete(hibernate javax)
-    public void eliminarGenero(int id) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
 
-            // Obtener el Genero por ID
+    // Eliminar un género por ID
+    public void eliminarGenero(int id) {
+        try {
             Generos genero = session.get(Generos.class, id);
             if (genero != null) {
-                // Eliminar el objeto género
-                session.delete(genero);
-                transaction.commit();
+                session.delete(genero); // Usar la sesión activa para eliminar el objeto
             }
-
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al eliminar género: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
-    //select(hibernate javax)
+
+    // Seleccionar un género por ID
     public Generos s(int id) {
-        Generos genero = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Obtener el Genero por ID
-            genero = session.get(Generos.class, id);
+        try {
+            return session.get(Generos.class, id); // Usar la sesión activa para obtener el objeto
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al seleccionar género: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
-
-        return genero;
     }
 
-    // 2 select
+    // Seleccionar un género por nombre
     public Generos s2(String nombreGenero) {
-        Generos genero = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Buscar el género usando HQL
+        try {
+            // Usa HQL para buscar el género con la propiedad correcta
             Query<Generos> query = session.createQuery("FROM Generos WHERE genero = :nombreGenero", Generos.class);
             query.setParameter("nombreGenero", nombreGenero);
-            genero = query.uniqueResult(); // Obtiene el único resultado
+            return query.uniqueResult(); // Devuelve el género si existe
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al seleccionar género por nombre: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
-
-        return genero;
     }
 
+    // Crear o obtener un género por nombre
+    public Generos crearOObtenerGenero(String nombreGenero) {
+        try {
+            Generos genero = s2(nombreGenero); // Busca el género por nombre
+            if (genero == null) {
+                genero = new Generos();
+                genero.setGenero(nombreGenero); // Asegúrate de usar el nombre correcto del setter
+                session.persist(genero); // Inserta el nuevo género
+            }
+            return genero;
+        } catch (Exception e) {
+            System.err.println("Error al crear u obtener género: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
+        }
+    }
 }

@@ -1,73 +1,57 @@
 package org.example.daos;
 
-import org.example.entidades.*;
-import org.example.util.HibernateUtil;
-import org.hibernate.*;
-
+import org.example.entidades.DetallesJuego;
+import org.hibernate.Session;
 
 public class DaoDetallesJuego {
 
-    //crud tabla detallesjuego
-    //insert(hibernate javax)
+    private Session session;
+
+    // Constructor que acepta una sesión activa
+    public DaoDetallesJuego(Session session) {
+        this.session = session;
+    }
+
+    // Insertar un objeto DetallesJuego
     public void i(DetallesJuego detallesJuego) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            // Guardar el objeto DetallesJuego
-            session.save(detallesJuego);
-            transaction.commit();
-
+        try {
+            session.persist(detallesJuego); // Usar la sesión activa para guardar el objeto
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al insertar DetallesJuego: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
-    //update(hibernate javax)
+
+    // Actualizar un objeto DetallesJuego
     public void u(DetallesJuego detallesJuego) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            // Actualizar el objeto DetallesJuego
-            session.update(detallesJuego);
-            transaction.commit();
-
+        try {
+            session.update(detallesJuego); // Usar la sesión activa para actualizar el objeto
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al actualizar DetallesJuego: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
-    //delete(hibernate javax)
-    public void d(int juegoId) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
 
-            // Obtener el DetallesJuego por juegoId
+    // Eliminar un objeto DetallesJuego por ID
+    public void d(int juegoId) {
+        try {
             DetallesJuego detallesJuego = session.get(DetallesJuego.class, juegoId);
             if (detallesJuego != null) {
-                // Eliminar el objeto DetallesJuego
-                session.delete(detallesJuego);
-                transaction.commit();
+                session.remove(detallesJuego); // Usar la sesión activa para eliminar el objeto
             }
-
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al eliminar DetallesJuego: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
-    //select(hibernate javax)
+
+    // Seleccionar un objeto DetallesJuego por ID
     public DetallesJuego s(int juegoId) {
-        DetallesJuego detallesJuego = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // Obtener el DetallesJuego por juegoId
-            detallesJuego = session.get(DetallesJuego.class, juegoId);
+        try {
+            return session.get(DetallesJuego.class, juegoId); // Usar la sesión activa para obtener el objeto
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al seleccionar DetallesJuego: " + e.getMessage());
+            throw e; // Lanza la excepción para que la transacción principal la maneje
         }
-
-        return detallesJuego;
     }
-
 }

@@ -1,98 +1,89 @@
 package org.example.daos;
 
 import org.example.entidades.JuegoEquipo;
-
-import org.example.util.HibernateUtil;
-import org.hibernate.*;
+import org.hibernate.Session;
 import org.hibernate.query.Query;
+
 import java.util.List;
 
 public class DaoJuegoEquipo {
 
+    private Session session;
+
+    // Constructor que acepta una sesión activa
+    public DaoJuegoEquipo(Session session) {
+        this.session = session;
+    }
+
     // Crear una nueva relación entre un juego y un desarrollador
     public void crearRelacionJuegoDesarrollador(int juegoId, int desarrolladorId) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            JuegoEquipo relacion = new JuegoEquipo(); // Creamos el objeto sin asignar id (será autogenerado)
+        try {
+            JuegoEquipo relacion = new JuegoEquipo(); // Crear objeto sin asignar ID (se autogenera)
             relacion.setJuegoId(juegoId);
             relacion.setDesarrolladorId(desarrolladorId);
-            session.save(relacion); // Guardamos la nueva relación
-            transaction.commit();
-
+            session.persist(relacion); // Guardar la relación usando la sesión activa
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al crear relación juego-desarrollador: " + e.getMessage());
+            throw e; // Lanzar la excepción para que la transacción principal la maneje
         }
     }
 
     // Leer una relación entre un juego y un desarrollador por su ID
     public JuegoEquipo leerJuegoEquipo(int id) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(JuegoEquipo.class, id); // Obtener relación por ID
+        try {
+            return session.get(JuegoEquipo.class, id); // Obtener relación por ID usando la sesión activa
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al leer relación juego-desarrollador: " + e.getMessage());
+            throw e; // Lanzar la excepción para que la transacción principal la maneje
         }
-        return null;
     }
 
     // Obtener todas las relaciones entre juegos y desarrolladores
     public List<JuegoEquipo> obtenerTodos() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Query<JuegoEquipo> query = session.createQuery("FROM Juego_equipo", JuegoEquipo.class);
+        try {
+            Query<JuegoEquipo> query = session.createQuery("FROM JuegoEquipo", JuegoEquipo.class);
             return query.list(); // Retornar todas las relaciones
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al obtener todas las relaciones: " + e.getMessage());
+            throw e; // Lanzar la excepción para que la transacción principal la maneje
         }
-        return null;
     }
 
     // Obtener todas las relaciones entre juegos y desarrolladores por el nombre del desarrollador
     public List<JuegoEquipo> obtenerPorNombreDesarrollador(String nombreDesarrollador) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            String hql = "SELECT je FROM Juego_equipo je " +
-                    "JOIN Desarrollador d ON je.desarrolladorId = d.id " +
+        try {
+            String hql = "SELECT je FROM JuegoEquipo je " +
+                    "JOIN Desarrolladores d ON je.desarrolladorId = d.id " +
                     "WHERE d.nombre = :nombreDesarrollador";
             Query<JuegoEquipo> query = session.createQuery(hql, JuegoEquipo.class);
             query.setParameter("nombreDesarrollador", nombreDesarrollador);
             return query.list(); // Retornar relaciones filtradas por el nombre del desarrollador
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Error al obtener relaciones por nombre del desarrollador: " + e.getMessage());
+            throw e; // Lanzar la excepción para que la transacción principal la maneje
         }
-        return null;
     }
 
     // Actualizar una relación entre un juego y un desarrollador
     public void actualizarRelacionJuegoDesarrollador(JuegoEquipo relacion) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            session.update(relacion); // Actualizar la relación
-            transaction.commit();
-
+        try {
+            session.update(relacion); // Actualizar la relación usando la sesión activa
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al actualizar relación juego-desarrollador: " + e.getMessage());
+            throw e; // Lanzar la excepción para que la transacción principal la maneje
         }
     }
 
     // Eliminar una relación entre un juego y un desarrollador por su ID
     public void eliminarRelacionJuegoDesarrollador(int id) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-
-            JuegoEquipo relacion = session.get(JuegoEquipo.class, id); // Obtener relación por ID
+        try {
+            JuegoEquipo relacion = session.get(JuegoEquipo.class, id);
             if (relacion != null) {
-                session.delete(relacion); // Eliminar relación
+                session.delete(relacion); // Eliminar relación usando la sesión activa
             }
-            transaction.commit();
-
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            e.printStackTrace();
+            System.err.println("Error al eliminar relación juego-desarrollador: " + e.getMessage());
+            throw e; // Lanzar la excepción para que la transacción principal la maneje
         }
     }
 }

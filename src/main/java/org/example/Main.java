@@ -1,7 +1,7 @@
 package org.example;
 
 import org.example.util.*;
-import org.hibernate.Session;
+import org.hibernate.*;
 
 import java.io.IOException;
 import java.util.InputMismatchException;
