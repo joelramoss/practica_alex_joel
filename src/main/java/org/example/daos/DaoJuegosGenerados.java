@@ -76,13 +76,12 @@ public class DaoJuegosGenerados {
     // Eliminar una relación entre un juego y un género por su ID
     public void eliminarRelacionJuegoGenero(int juegoId) {
         try {
-            JuegosGenerados relacion = session.get(JuegosGenerados.class, juegoId); // Obtener relación por ID
-            if (relacion != null) {
-                session.delete(relacion); // Eliminar la relación usando la sesión activa
-            }
+            String hql = "DELETE FROM juegos_generados WHERE juegoId = :juegoId";
+            session.createQuery(hql)
+                    .setParameter("juegoId", juegoId)
+                    .executeUpdate();
         } catch (Exception e) {
-            System.err.println("Error al eliminar relación juego-género: " + e.getMessage());
-            throw e; // Lanzar la excepción para que la transacción principal la maneje
+            System.out.println("Error al eliminar relaciones existentes: " + e.getMessage());
         }
     }
 }

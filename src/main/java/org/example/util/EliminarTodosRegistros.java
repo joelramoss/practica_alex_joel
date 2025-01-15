@@ -5,7 +5,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-public class EiminarTodosregistros  {
+public class EliminarTodosRegistros  {
 
     public static void eliminarTodosLosDatos() {
         Session session = HibernateUtil.getSessionFactory().openSession();  // Obtén la sesión de Hibernate

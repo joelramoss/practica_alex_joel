@@ -1,11 +1,15 @@
 package org.example.util;
 
+
 import org.example.daos.DaoJuego;
+
 import org.example.entidades.Juego;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.example.util.*;
 
 import java.sql.SQLException;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -18,7 +22,8 @@ public class EliminarRegistros {
         while (!salir) {
             System.out.println("\n=== Menú Eliminar Registros ===");
             System.out.println("1. Eliminar un juego por ID");
-            System.out.println("2. Volver al Menú Principal");
+            System.out.println("2. Eliminar todos los registros de la bbdd");
+            System.out.println("3. Volver al Menú Principal");
             System.out.print("Seleccione una opción: ");
 
             int opcion = leerOpcion();
@@ -28,6 +33,10 @@ public class EliminarRegistros {
                     eliminarJuego();
                     break;
                 case 2:
+                    System.out.println("Eliminando todos los registros de la base de datos...");
+                    EliminarTodosRegistros.eliminarTodosLosDatos();
+                    break;
+                case 3:
                     System.out.println("Volviendo al Menú Principal...");
                     salir = true;
                     break;

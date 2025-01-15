@@ -16,14 +16,15 @@ public class DaoDesarolladores {
         this.session = session;
     }
 
-    // Insertar un desarrollador
-    public void i(Desarrolladores desarrollador) {
-        try {
-            session.persist(desarrollador); // Usar la sesión activa para guardar el objeto
-        } catch (Exception e) {
-            System.err.println("Error al insertar desarrollador: " + e.getMessage());
-            throw e; // Lanza la excepción para que la transacción principal la maneje
+    //insertar o consultar un desarrollador
+    public Desarrolladores crearOObtenerDesarrollador(String nombreDesarrollador) {
+        Desarrolladores desarrollador = obtenerPorNombre(nombreDesarrollador);
+        if (desarrollador == null) {
+            desarrollador = new Desarrolladores();
+            desarrollador.setNombre(nombreDesarrollador);
+            session.persist(desarrollador);
         }
+        return desarrollador;
     }
 
     // Actualizar un desarrollador
@@ -41,7 +42,7 @@ public class DaoDesarolladores {
         try {
             Desarrolladores desarrollador = session.get(Desarrolladores.class, id);
             if (desarrollador != null) {
-                session.delete(desarrollador); // Usar la sesión activa para eliminar el objeto
+                session.remove(desarrollador); // Usar la sesión activa para eliminar el objeto
             }
         } catch (Exception e) {
             System.err.println("Error al eliminar desarrollador: " + e.getMessage());
@@ -62,18 +63,11 @@ public class DaoDesarolladores {
             throw e; // Lanza la excepción para que la transacción principal la maneje
         }
     }
+
     public Desarrolladores obtenerPorNombre(String nombreDesarrollador) {
         Query<Desarrolladores> query = session.createQuery("FROM Desarrolladores WHERE nombre = :nombre", Desarrolladores.class);
         query.setParameter("nombre", nombreDesarrollador);
         return query.uniqueResult();
     }
-    public Desarrolladores crearOObtenerDesarrollador(String nombreDesarrollador) {
-        Desarrolladores desarrollador = obtenerPorNombre(nombreDesarrollador);
-        if (desarrollador == null) {
-            desarrollador = new Desarrolladores();
-            desarrollador.setNombre(nombreDesarrollador);
-            session.persist(desarrollador);
-        }
-        return desarrollador;
-    }
+
 }

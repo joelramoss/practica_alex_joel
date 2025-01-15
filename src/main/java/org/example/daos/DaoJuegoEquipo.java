@@ -67,7 +67,22 @@ public class DaoJuegoEquipo {
     // Actualizar una relación entre un juego y un desarrollador
     public void actualizarRelacionJuegoDesarrollador(JuegoEquipo relacion) {
         try {
-            session.update(relacion); // Actualizar la relación usando la sesión activa
+            session.merge(relacion); // Actualizar la relación usando la sesión activa
+        } catch (Exception e) {
+            System.err.println("Error al actualizar relación juego-desarrollador: " + e.getMessage());
+            throw e; // Lanzar la excepción para que la transacción principal la maneje
+        }
+    }
+
+    public void actualizarDesarolladordeJuego(String nombreDesarrollador) {
+        try {
+            String hql = "UPDATE JuegoEquipo je SET je.desarrolladorId = " +
+                    "(SELECT d.id FROM Desarrolladores d WHERE d.nombre = :nombreDesarrollador) " +
+                    "WHERE je.desarrolladorId IS NOT NULL";
+            Query query = session.createQuery(hql);
+            query.setParameter("nombreDesarrollador", nombreDesarrollador);
+            int filasActualizadas = query.executeUpdate();
+            System.out.println(filasActualizadas + " registros actualizados.");
         } catch (Exception e) {
             System.err.println("Error al actualizar relación juego-desarrollador: " + e.getMessage());
             throw e; // Lanzar la excepción para que la transacción principal la maneje
@@ -79,7 +94,7 @@ public class DaoJuegoEquipo {
         try {
             JuegoEquipo relacion = session.get(JuegoEquipo.class, id);
             if (relacion != null) {
-                session.delete(relacion); // Eliminar relación usando la sesión activa
+                session.remove(relacion); // Eliminar relación usando la sesión activa
             }
         } catch (Exception e) {
             System.err.println("Error al eliminar relación juego-desarrollador: " + e.getMessage());

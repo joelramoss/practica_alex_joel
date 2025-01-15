@@ -10,6 +10,8 @@ import org.example.entidades.*;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import static org.example.util.Actualizarregistro.convertToDate;
+
 /**
  * Clase encargada de gestionar la adición de registros en la base de datos desde un archivo CSV.
  *
@@ -37,8 +39,6 @@ public class RegistroAñadir {
         while (!salir) {
             System.out.println("\n=== Menú Leer Registros ===");
             System.out.println("1. Añadir registro Juego entero");
-            System.out.println("2. Añadir equipo de desarollo");
-            System.out.println("3. Añadir generos");
             System.out.println("2. Volver al menú principal");
             System.out.println("3. Salir del programa");
             int opcion = leerOpcion();
@@ -108,14 +108,17 @@ public class RegistroAñadir {
                 juego.setTitle(sc.nextLine());
 
                 System.out.println("Introduce la fecha de lanzamiento (yyyy-MM-dd):");
-                juego.setReleaseDate(java.sql.Date.valueOf(sc.nextLine()));
+                juego.setReleaseDate(convertToDate(sc.nextLine()));
+
 
                 System.out.println("Introduce un resumen del juego:");
                 juego.setSummary(sc.nextLine());
 
-                System.out.println("Introduce el número de jugadores:");
+                juego.setPlays(leerEntero( "juegos jugados: "));
                 juego.setPlaying(leerEntero("jugadores actuales"));
-
+                juego.setBacklogs(leerEntero("juegos pendientes: "));
+                juego.setWishlist(leerEntero("lista de deseos: "));
+                juego.setTimesListed(leerEntero("veces listados: "));
                 // Guardar el juego en la base de datos
                 daoJuego.crearJuego(juego);
                 session.flush(); // Asegura que el juego se guarda antes de obtener el ID
@@ -126,7 +129,7 @@ public class RegistroAñadir {
                 // Capturar y guardar el rating del juego
                 System.out.println("Introduce el rating del juego (ejemplo: 4.5):");
                 double ratingValue = Double.parseDouble(sc.nextLine());
-                System.out.println("Introduce el número de reseñas para este rating:");
+
                 int numReviews = leerEntero("reseñas");
 
                 Rating rating = new Rating();
@@ -171,12 +174,5 @@ public class RegistroAñadir {
             }
         }
     }
-
-
-
-
-
-
-
 }
 

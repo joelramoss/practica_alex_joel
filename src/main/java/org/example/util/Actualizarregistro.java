@@ -16,6 +16,8 @@ import java.util.Scanner;
 import static org.example.Main.leerOpcion;
 
 public class Actualizarregistro {
+
+    public static boolean prueba = false;
     /**
      * Muestra el menú de opciones para actualizar registros en la base de datos.
      */
@@ -24,10 +26,8 @@ public class Actualizarregistro {
         while (!salir) {
             System.out.println("\n=== Menú Actualizar Registros ===");
             System.out.println("1. Actualizar registro de la tabla juego");
-            System.out.println("2. Actualizar registro de la tabla desarrolladores");
-            System.out.println("3. Actualizar registro de la tabla géneros");
-            System.out.println("4. Volver al menú principal");
-            System.out.println("5. Salir del programa");
+            System.out.println("2. Volver al menú principal");
+            System.out.println("3. Salir del programa");
             int opcion = leerOpcion();
 
             switch (opcion) {
@@ -35,15 +35,9 @@ public class Actualizarregistro {
                     actualizarJuego();
                     break;
                 case 2:
-                    actualizarDesarrollador();
+                    salir = true;
                     break;
                 case 3:
-                    actualizarGenero();
-                    break;
-                case 4:
-                    salir = true; // Volver al menú principal
-                    break;
-                case 5:
                     System.out.println("Saliendo del programa...");
                     Thread.sleep(1000);
                     System.exit(0);
@@ -69,6 +63,7 @@ public class Actualizarregistro {
             Juego juego = dao.obtenerPorId(id);
             if (juego == null) {
                 System.out.println("Juego no encontrado.");
+                session.getTransaction().rollback();
                 return;
             }
 
@@ -80,18 +75,17 @@ public class Actualizarregistro {
             juego.setReleaseDate(convertToDate(fechaInput));
             juego.setSummary(obtenerInputString(scanner, "Ingrese el nuevo resumen: "));
             juego.setPlays(obtenerInputInt(scanner, "Ingrese el nuevo número de juegos jugados: "));
+            scanner.nextLine(); // Limpiar buffer
             juego.setPlaying(obtenerInputInt(scanner, "Ingrese el nuevo número de jugadores actuales: "));
+            scanner.nextLine(); // Limpiar buffer
             juego.setBacklogs(obtenerInputInt(scanner, "Ingrese el nuevo número de juegos pendientes: "));
+            scanner.nextLine(); // Limpiar buffer
             juego.setWishlist(obtenerInputInt(scanner, "Ingrese el nuevo número de lista de deseos: "));
+            scanner.nextLine(); // Limpiar buffer
             juego.setTimesListed(obtenerInputInt(scanner, "Ingrese el nuevo número de veces listados: "));
+            scanner.nextLine(); // Limpiar buffer
 
             dao.actualizarJuego(juego);
-
-            // Actualizar géneros asociados al juego
-            actualizarGenerosJuego(scanner, juego.getId(), daoJuegosGenerados);
-
-            // Actualizar desarrolladores asociados al juego
-            actualizarDesarrolladoresJuego(scanner, juego.getId(), daoJuegoEquipo);
 
             session.getTransaction().commit();
             System.out.println("Juego actualizado con éxito.");
@@ -100,85 +94,7 @@ public class Actualizarregistro {
         }
     }
 
-    private static void actualizarGenerosJuego(Scanner scanner, int juegoId, DaoJuegosGenerados daoJuegosGenerados) {
-        System.out.println("¿Desea actualizar los géneros del juego? (sí/no)");
-        String respuesta = scanner.nextLine().toLowerCase();
 
-        if (respuesta.equals("sí")) {
-            System.out.println("Ingrese los nuevos géneros del juego (separados por coma): ");
-            String[] nuevosGeneros = scanner.nextLine().split(",");
-
-            for (String genero : nuevosGeneros) {
-                if (genero.trim().isEmpty()) continue;
-                daoJuegosGenerados.crearRelacionJuegoGenero(juegoId, genero.trim());
-            }
-        }
-    }
-
-    private static void actualizarDesarrolladoresJuego(Scanner scanner, int juegoId, DaoJuegoEquipo daoJuegoEquipo) {
-        System.out.println("¿Desea actualizar los desarrolladores del juego? (s/n)");
-        String respuesta = scanner.nextLine().toLowerCase();
-
-        if (respuesta.equals("s")) {
-            System.out.println("Ingrese los nuevos desarrolladores del juego (separados por coma): ");
-            String[] nuevosDesarrolladores = scanner.nextLine().split(",");
-
-            for (String desarrollador : nuevosDesarrolladores) {
-                if (desarrollador.trim().isEmpty()) continue;
-                daoJuegoEquipo.crearRelacionJuegoDesarrollador(juegoId, desarrollador.trim().hashCode());
-            }
-        }
-    }
-
-    private static void actualizarDesarrollador() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Scanner scanner = new Scanner(System.in);
-            DaoDesarolladores dao = new DaoDesarolladores(session);
-
-            session.beginTransaction();
-            System.out.print("Ingrese el ID del desarrollador a actualizar: ");
-            int id = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
-
-            Desarrolladores desarrollador = dao.s(id);
-            if (desarrollador == null) {
-                System.out.println("Desarrollador no encontrado.");
-                return;
-            }
-
-            desarrollador.setNombre(obtenerInputString(scanner, "Ingrese el nuevo nombre: "));
-            dao.u(desarrollador);
-            session.getTransaction().commit();
-            System.out.println("Desarrollador actualizado con éxito.");
-        } catch (Exception e) {
-            System.out.println("Error al actualizar el desarrollador: " + e.getMessage());
-        }
-    }
-
-    private static void actualizarGenero() {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            Scanner scanner = new Scanner(System.in);
-            DaoGeneros dao = new DaoGeneros(session);
-
-            session.beginTransaction();
-            System.out.print("Ingrese el ID del género a actualizar: ");
-            int id = scanner.nextInt();
-            scanner.nextLine(); // Limpiar buffer
-
-            Generos genero = dao.s(id);
-            if (genero == null) {
-                System.out.println("Género no encontrado.");
-                return;
-            }
-
-            genero.setGenero(obtenerInputString(scanner, "Ingrese el nuevo nombre del género: "));
-            dao.u(genero);
-            session.getTransaction().commit();
-            System.out.println("Género actualizado con éxito.");
-        } catch (Exception e) {
-            System.out.println("Error al actualizar el género: " + e.getMessage());
-        }
-    }
 
     private static String obtenerInputString(Scanner scanner, String mensaje) {
         System.out.print(mensaje);
@@ -198,9 +114,19 @@ public class Actualizarregistro {
         try {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             LocalDate localDate = LocalDate.parse(dateStr, formatter);
+
+            // Obtener el año actual
+            int currentYear = LocalDate.now().getYear();
+
+            // Validar que la fecha no sea más antigua de 200 años ni posterior al año actual
+            if (localDate.getYear() < currentYear - 100 || localDate.getYear() > currentYear) {
+                throw new IllegalArgumentException("La fecha debe estar entre " + (currentYear - 100) + " y " + currentYear + ".");
+            }
+
             return java.sql.Date.valueOf(localDate);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Formato de fecha no válido. Use yyyy-MM-dd.");
         }
     }
+
 }
